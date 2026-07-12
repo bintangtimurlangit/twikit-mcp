@@ -4,14 +4,18 @@ An **MCP (Model Context Protocol) server** that lets an AI assistant — Claude
 Desktop, Claude Code, Cursor, or any MCP client — read and act on **Twitter / X**
 through a single authenticated session. **No official X API key required.**
 
-It's built on top of [**twikit**](https://github.com/d60/twikit), an
-API-key-free X client for Python. This project just exposes twikit's capabilities
-as clean, model-friendly MCP tools.
+> ## Built on twikit
+> All the real work — the actual Twitter/X client — is
+> [**twikit** by **d60**](https://github.com/d60/twikit). Full credit and rights
+> to the original library belong to its author. This project is only a thin MCP
+> wrapper around it. ⭐ **Please star the [original repo](https://github.com/d60/twikit).**
 
-> ⚠️ It currently depends on a **patched fork** of twikit, because upstream
-> twikit's login is broken on current X (the `Couldn't get KEY_BYTE indices`
-> bug). The fix has been submitted upstream; once merged this will depend on the
-> released package.
+It exposes twikit's capabilities as clean, model-friendly MCP tools.
+
+> ⚠️ It depends on a lightly **patched fork** of twikit, because the published
+> twikit is currently broken on X (the `Couldn't get KEY_BYTE indices` login
+> bug). The fork only fixes login; when the upstream package ships a fix you can
+> point the dependency back at plain `twikit`.
 
 ---
 

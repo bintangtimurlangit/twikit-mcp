@@ -14,9 +14,10 @@ keywords = ["mcp", "twitter", "x", "twikit", "model-context-protocol", "ai", "ll
 
 dependencies = [
     "mcp>=1.2.0",
-    # twikit login is broken on upstream/PyPI until the fix is merged, so pin to
-    # the patched fork branch for now. Switch to "twikit>=2.3.4" once the login
-    # fix lands upstream (see https://github.com/d60/twikit).
+    # The published twikit is currently broken on X (the "Couldn't get KEY_BYTE
+    # indices" login bug), so we pin to a patched fork that only fixes login.
+    # Switch back to plain "twikit" once upstream ships a fix.
+    # Original library: https://github.com/d60/twikit
     "twikit @ git+https://github.com/bintangtimurlangit/twikit@fix/login-transaction-and-2fa",
 ]
 
