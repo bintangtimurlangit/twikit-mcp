@@ -12,10 +12,11 @@ through a single authenticated session. **No official X API key required.**
 
 It exposes twikit's capabilities as clean, model-friendly MCP tools.
 
-> ⚠️ It depends on a lightly **patched fork** of twikit, because the published
-> twikit is currently broken on X (the `Couldn't get KEY_BYTE indices` login
-> bug). The fork only fixes login; when the upstream package ships a fix you can
-> point the dependency back at plain `twikit`.
+> ⚠️ This repo **bundles a lightly patched copy of twikit** (under
+> [`twikit/`](twikit/), MIT — see [`licenses/twikit-LICENSE.txt`](licenses/twikit-LICENSE.txt)),
+> because the published twikit is currently broken on X (the `Couldn't get
+> KEY_BYTE indices` login bug). The patch only fixes login. When upstream ships a
+> fix, the bundled copy can be dropped in favour of the PyPI `twikit` package.
 
 ---
 
@@ -64,11 +65,10 @@ git clone https://github.com/bintangtimurlangit/twikit-mcp
 cd twikit-mcp && pip install -e .
 ```
 
-> **Why `git+…` and not `pip install twikit-mcp`?** The package depends on a
-> patched build of twikit (published twikit's login is currently broken), and
-> PyPI does not allow direct-URL dependencies. Installing straight from GitHub
-> resolves the patched dependency automatically. A PyPI release is planned once
-> the upstream login fix ships.
+> **Why `git+…` and not `pip install twikit-mcp`?** It isn't published to PyPI
+> yet — installing straight from GitHub is the current path. (The package is
+> self-contained: twikit is bundled in, so there are no external Git
+> dependencies to resolve.)
 
 ---
 
@@ -156,5 +156,8 @@ commits, PR titles and issue titles — see [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Credits
 
 - [**twikit**](https://github.com/d60/twikit) by **d60** — the underlying X
-  client that does all the heavy lifting (MIT).
+  client that does all the heavy lifting (MIT). A patched copy is bundled here
+  under [`twikit/`](twikit/); its license is preserved at
+  [`licenses/twikit-LICENSE.txt`](licenses/twikit-LICENSE.txt). ⭐ Please star the
+  [original repo](https://github.com/d60/twikit).
 - This project (`twikit-mcp`) is MIT-licensed. See [`LICENSE`](LICENSE).

@@ -14,19 +14,30 @@ keywords = ["mcp", "twitter", "x", "twikit", "model-context-protocol", "ai", "ll
 
 dependencies = [
     "mcp>=1.2.0",
-    # The published twikit is currently broken on X (the "Couldn't get KEY_BYTE
-    # indices" login bug), so we pin to a patched fork that only fixes login.
-    # Switch back to plain "twikit" once upstream ships a fix.
-    # Original library: https://github.com/d60/twikit
-    "twikit @ git+https://github.com/bintangtimurlangit/twikit@fix/login-transaction-and-2fa",
+    # twikit is bundled (vendored) in this repo under twikit/ with a login patch,
+    # because the published twikit is broken on X (the "Couldn't get KEY_BYTE
+    # indices" login bug). These are twikit's own runtime dependencies. When
+    # upstream ships a login fix, delete the bundled twikit/ and add "twikit"
+    # here instead. Original library: https://github.com/d60/twikit
+    "httpx[socks]",
+    "filetype",
+    "beautifulsoup4",
+    "pyotp",
+    "lxml",
+    "webvtt-py",
+    "m3u8",
+    "Js2Py-3.13",
 ]
 
 [project.urls]
 Homepage = "https://github.com/bintangtimurlangit/twikit-mcp"
-"twikit (upstream)" = "https://github.com/d60/twikit"
+"twikit (original library)" = "https://github.com/d60/twikit"
 
 [project.scripts]
 twikit-mcp = "twikit_mcp.server:main"
 
-[tool.setuptools]
-packages = ["twikit_mcp"]
+[tool.setuptools.packages.find]
+include = ["twikit*", "twikit_mcp*"]
+
+[tool.setuptools.package-data]
+twikit = ["py.typed"]
