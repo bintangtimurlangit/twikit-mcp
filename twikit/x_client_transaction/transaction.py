@@ -50,16 +50,20 @@ class ClientTransaction:
 
         row_index, key_bytes_indices = await self.get_indices(
             home_page_response, session, headers)
+        # get_animation_key() reads DEFAULT_ROW_INDEX / DEFAULT_KEY_BYTES_INDICES
+        # off ``self``, so these must be committed before it runs. They are pure
+        # derived values; leaving them set on a later failure is harmless because
+        # the request path gates the header on ``self.key is not None``.
+        self.DEFAULT_ROW_INDEX = row_index
+        self.DEFAULT_KEY_BYTES_INDICES = key_bytes_indices
         key = self.get_key(response=home_page_response)
         key_bytes = self.get_key_bytes(key=key)
         animation_key = self.get_animation_key(
             key_bytes=key_bytes, response=home_page_response)
 
-        # Only commit state once every step has succeeded. This guarantees that
-        # a partially-completed init (e.g. X changed its JS) never leaves the
-        # object in a half-populated state that crashes on the next request.
-        self.DEFAULT_ROW_INDEX = row_index
-        self.DEFAULT_KEY_BYTES_INDICES = key_bytes_indices
+        # Only commit the rest once every step has succeeded, so a partially
+        # completed init (e.g. X changed its JS) never leaves the object with a
+        # usable-looking ``key`` that crashes on the next request.
         self.key = key
         self.key_bytes = key_bytes
         self.animation_key = animation_key

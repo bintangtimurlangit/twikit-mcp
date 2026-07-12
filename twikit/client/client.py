@@ -2666,6 +2666,11 @@ class Client:
         category = category.lower()
         if category in ['news', 'sports', 'entertainment']:
             category += '_unified'
+        if additional_request_params is None:
+            # As of 2026 X's guide.json only returns the trend module when this
+            # candidate source is requested explicitly; without it the response
+            # contains cursor entries only and no trends.
+            additional_request_params = {'candidate_source': 'trends'}
         response, _ = await self.v11.guide(category, count, additional_request_params)
 
         entry_id_prefix = 'trends' if category == 'trending' else 'Guide'
@@ -2675,11 +2680,15 @@ class Client:
         ]
 
         if not entries:
-            if not retry:
+            # ``retry`` may be an int (remaining attempts) or a bool. Recurse a
+            # bounded number of times, since the trend module is sometimes
+            # omitted transiently, but never loop forever when X stops returning
+            # it at all (previously this recursed until RecursionError).
+            attempts_left = (retry - 1) if isinstance(retry, int) and not isinstance(retry, bool) else (5 if retry else 0)
+            if attempts_left <= 0:
                 return []
-            # Recall the method again, as the trend information
-            # may not be returned due to a Twitter error.
-            return await self.get_trends(category, count, retry, additional_request_params)
+            return await self.get_trends(
+                category, count, attempts_left, additional_request_params)
 
         items = entries[-1]['content']['timelineModule']['items']
 
