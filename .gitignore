@@ -1,0 +1,14 @@
+# Python build / env artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# Secrets / session
+cookies.json
+*.cookies.json
+.env

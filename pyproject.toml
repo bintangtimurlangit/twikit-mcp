@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "twikit-mcp"
+version = "0.1.0"
+description = "MCP server exposing twikit's Twitter/X capabilities to AI assistants — no official API key required."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "bintangtimurlangit" }]
+keywords = ["mcp", "twitter", "x", "twikit", "model-context-protocol", "ai", "llm"]
+
+dependencies = [
+    "mcp>=1.2.0",
+    # twikit login is broken on upstream/PyPI until the fix is merged, so pin to
+    # the patched fork branch for now. Switch to "twikit>=2.3.4" once the login
+    # fix lands upstream (see https://github.com/d60/twikit).
+    "twikit @ git+https://github.com/bintangtimurlangit/twikit@fix/login-transaction-and-2fa",
+]
+
+[project.urls]
+Homepage = "https://github.com/bintangtimurlangit/twikit-mcp"
+"twikit (upstream)" = "https://github.com/d60/twikit"
+
+[project.scripts]
+twikit-mcp = "twikit_mcp.server:main"
+
+[tool.setuptools]
+packages = ["twikit_mcp"]
