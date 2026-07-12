@@ -21,11 +21,14 @@ It exposes twikit's capabilities as clean, model-friendly MCP tools.
 
 ## Features
 
-26 tools across:
+- **27 tools** covering users, tweets (read + write), timelines, trends and DMs.
+- **No X API key** — authenticates as a normal account via cookies or login.
+- **Built-in rate limiting**, on by default, to help avoid suspension ([configurable](#rate-limiting)).
+- **One-line run** with `uvx` (no manual install), or `pip`.
 
 | Area | Tools |
 |---|---|
-| Session | `whoami` |
+| Session | `whoami`, `rate_limit_status` |
 | Users | `get_user`, `get_user_by_id`, `search_users`, `get_user_tweets`, `get_user_followers`, `get_user_following`, `follow_user`, `unfollow_user`, `block_user`, `mute_user` |
 | Tweets (read) | `get_tweet`, `search_tweets`, `get_home_timeline`, `get_retweeters`, `get_favoriters` |
 | Tweets (write) | `post_tweet`, `delete_tweet`, `like_tweet`, `unlike_tweet`, `retweet`, `undo_retweet`, `bookmark_tweet` |
@@ -39,71 +42,97 @@ pass `next_cursor` back in to page.
 
 ## Install
 
+`twikit-mcp` is a **Python** package. The easiest way to run it is with
+[`uv`](https://docs.astral.sh/uv/)'s `uvx` (the Python equivalent of `npx` —
+downloads and runs in one step, nothing to install first):
+
 ```bash
+uvx --from git+https://github.com/bintangtimurlangit/twikit-mcp twikit-mcp
+```
+
+Alternatives:
+
+```bash
+# pipx (isolated install)
+pipx install git+https://github.com/bintangtimurlangit/twikit-mcp
+
+# plain pip
 pip install git+https://github.com/bintangtimurlangit/twikit-mcp
-```
 
-or from a clone:
-
-```bash
+# from a clone (for development)
 git clone https://github.com/bintangtimurlangit/twikit-mcp
-cd twikit-mcp
-pip install -e .
+cd twikit-mcp && pip install -e .
 ```
+
+> **Why `git+…` and not `pip install twikit-mcp`?** The package depends on a
+> patched build of twikit (published twikit's login is currently broken), and
+> PyPI does not allow direct-URL dependencies. Installing straight from GitHub
+> resolves the patched dependency automatically. A PyPI release is planned once
+> the upstream login fix ships.
+
+---
+
+## Connect your MCP client
+
+Per-client, copy-paste setup for **Claude Code, Claude Desktop, Cursor,
+Windsurf, VS Code** and more is in **[INSTALL.md](INSTALL.md)**.
+
+Using a client that isn't documented there? Point its AI at
+**[llms-install.md](llms-install.md)** — a machine-readable install spec an agent
+can follow to wire this server into any MCP client.
 
 ---
 
 ## Authenticate
 
-The server reads credentials from environment variables on first use.
+X's automated login regularly trips a Cloudflare / "verify you're human"
+challenge, so the reliable way to authenticate is to **copy two cookies from a
+browser where you're already logged in to x.com**: `auth_token` and `ct0`.
 
-**Preferred — reuse an exported cookie file (most reliable, no password):**
+**1. Grab the cookies**
 
-```bash
-export TWIKIT_COOKIES_FILE=/absolute/path/to/cookies.json
-```
+1. Log in to <https://x.com> in your browser.
+2. Open DevTools → **Application** (Chrome/Edge) or **Storage** (Firefox) →
+   **Cookies** → `https://x.com`.
+3. Copy the **Value** of `auth_token` and of `ct0`.
 
-Generate `cookies.json` once with twikit (`client.save_cookies('cookies.json')`)
-or a browser cookie exporter.
-
-**Or log in with credentials:**
+**2. Set them as environment variables**
 
 | Variable | Required | Notes |
 |---|---|---|
-| `TWIKIT_AUTH_INFO_1` | yes | username / email / phone |
-| `TWIKIT_AUTH_INFO_2` | no | secondary identifier (recommended) |
-| `TWIKIT_PASSWORD` | yes | account password |
-| `TWIKIT_TOTP_SECRET` | no | 2FA / TOTP secret |
-| `TWIKIT_COOKIES_FILE` | no | if set, cookies are saved here after login and reused next run |
-| `TWIKIT_LANGUAGE` | no | default `en-US` |
-| `TWIKIT_PROXY` | no | e.g. `http://user:pass@host:port` |
+| `TWIKIT_AUTH_TOKEN` | ✅ | the `auth_token` cookie value |
+| `TWIKIT_CT0` | ✅ | the `ct0` cookie value |
+| `TWIKIT_LANGUAGE` | | default `en-US` |
+| `TWIKIT_PROXY` | | e.g. `http://user:pass@host:port` |
 
-> Interactive email/2FA challenges can't be answered over stdio — prefer the
-> cookie-file method for headless use.
+> 🔐 Treat these like a password — they grant access to your account. Don't
+> commit them anywhere. They rotate when you log out of that browser session, so
+> refresh them if requests start failing.
+
+See [INSTALL.md](INSTALL.md) for exactly where these go in each client's config.
+
+### Rate limiting
+
+To reduce the risk of rate-limit errors or account suspension, the server
+throttles tool calls **by default** (token bucket, 30 calls/minute).
+
+| Variable | Default | Notes |
+|---|---|---|
+| `TWIKIT_MCP_RATE_LIMIT` | `on` | Set to `off` (or `0`/`false`) to **disable** throttling entirely |
+| `TWIKIT_MCP_RATE_LIMIT_PER_MINUTE` | `30` | Max tool calls per minute |
+
+Call the `rate_limit_status` tool to see the active configuration.
 
 ---
 
-## Run
+## Run manually
 
 ```bash
 python -m twikit_mcp      # or:  twikit-mcp
 ```
 
-### Claude Desktop / Claude Code config
-
-```json
-{
-  "mcpServers": {
-    "twikit": {
-      "command": "python",
-      "args": ["-m", "twikit_mcp"],
-      "env": {
-        "TWIKIT_COOKIES_FILE": "/absolute/path/to/cookies.json"
-      }
-    }
-  }
-}
-```
+You normally won't run it by hand — your MCP client launches it. See
+[INSTALL.md](INSTALL.md) for client setup.
 
 ---
 
@@ -113,6 +142,14 @@ Automating X may violate its Terms of Service and can get accounts rate-limited
 or suspended. Use a purpose-made account, keep volume low, and respect
 [twikit's rate-limit notes](https://github.com/d60/twikit/blob/main/ratelimits.md).
 Don't use this for spam, harassment, or mass automation.
+
+---
+
+## Contributing
+
+Contributions welcome! This project uses
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for
+commits, PR titles and issue titles — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
