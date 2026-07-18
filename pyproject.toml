@@ -13,7 +13,7 @@ authors = [{ name = "bintangtimurlangit" }]
 keywords = ["mcp", "twitter", "x", "twikit", "model-context-protocol", "ai", "llm"]
 
 dependencies = [
-    "mcp>=1.2.0",
+    "mcp>=1.28.1",
     # twikit is bundled (vendored) in this repo under twikit/ with a login patch,
     # because the published twikit is broken on X (the "Couldn't get KEY_BYTE
     # indices" login bug). These are twikit's own runtime dependencies. When
