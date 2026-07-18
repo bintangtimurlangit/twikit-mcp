@@ -1,11 +1,12 @@
 name: Release
 
-# Builds the distribution and opens a GitHub release when a version tag is
-# pushed, e.g.:  git tag v0.1.1 && git push origin v0.1.1
+# Builds and publishes to PyPI when a version tag is pushed, e.g.:
+#   git tag v0.1.1 && git push origin v0.1.1
 #
-# The package is not on PyPI yet (it installs from GitHub). To enable PyPI
-# publishing later, add a publish step (Trusted Publishing via OIDC, or
-# `uv publish` with UV_PUBLISH_TOKEN).
+# Uses PyPI **Trusted Publishing (OIDC)** — NO token, nothing to rotate, nothing
+# expires. One-time setup: on PyPI, register this GitHub repo + `release.yml` as
+# a Trusted Publisher for the project (Project → Settings → Publishing).
+# Until that is configured, the publish step will fail; the build still runs.
 
 on:
   push:
@@ -13,7 +14,7 @@ on:
 
 permissions:
   contents: write # create the GitHub release
-  id-token: write # reserved for PyPI Trusted Publishing
+  id-token: write # PyPI Trusted Publishing (OIDC)
 
 jobs:
   release:
@@ -28,6 +29,10 @@ jobs:
       - run: uv run ruff check .
       - name: Build distribution
         run: uv build
+
+      - name: Publish to PyPI (Trusted Publishing — tokenless)
+        uses: pypa/gh-action-pypi-publish@release/v1
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
