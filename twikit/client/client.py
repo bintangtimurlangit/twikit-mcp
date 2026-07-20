@@ -125,6 +125,33 @@ class Client:
         self.gql = GQLClient(self)
         self.v11 = V11Client(self)
 
+    def _extract_cursor_value(self, entry: dict) -> str | None:
+        """
+        Get the pagination cursor from a TimelineCursor entry.
+
+        Supports both formats used by X:
+
+        Old:
+            content.itemContent.value
+
+        New:
+            content.value
+        """
+
+        content = entry.get("content", {})
+
+        item_content = content.get("itemContent")
+        if isinstance(item_content, dict):
+            value = item_content.get("value")
+            if value:
+                return value
+
+        value = content.get("value")
+        if value:
+            return value
+
+        return None
+
     async def request(
         self,
         method: str,
@@ -1593,7 +1620,7 @@ class Client:
                 results.append(tweet)
 
         if entries[-1]['entryId'].startswith('cursor'):
-            next_cursor = entries[-1]['content']['itemContent']['value']
+            next_cursor = self._extract_cursor_value(entries[-1])
             _fetch_next_result = partial(self._get_more_replies, tweet_id, next_cursor)
         else:
             next_cursor = None
@@ -1702,7 +1729,7 @@ class Client:
 
         if entries[-1]['entryId'].startswith('cursor'):
             # if has more replies
-            reply_next_cursor = entries[-1]['content']['itemContent']['value']
+            reply_next_cursor = self._extract_cursor_value(entries[-1])
             _fetch_more_replies = partial(self._get_more_replies,
                                           tweet_id, reply_next_cursor)
         else:
