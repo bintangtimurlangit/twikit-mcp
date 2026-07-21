@@ -6,7 +6,10 @@ X changed the shape of ``TimelineTimelineCursor`` entries: the cursor moved from
 former unconditionally and raised ``KeyError: 'itemContent'`` on the new payloads
 (most visibly in ``get_tweet_by_id`` on long-form posts).
 
-``Client._extract_cursor_value`` reads both shapes. These tests pin that
+Cursors also arrive under two different wrapper keys — ``content`` for top-level
+timeline entries, ``item`` for the nested "show more replies" cursor.
+
+``Client._extract_cursor_value`` reads every combination. These tests pin that
 behaviour so a future refactor can't quietly reintroduce the KeyError.
 """
 
@@ -19,14 +22,22 @@ from twikit.client.client import Client
 extract = Client._extract_cursor_value
 
 
-def test_reads_old_cursor_shape():
-    entry = {"entryId": "cursor-bottom-0", "content": {"itemContent": {"value": "OLD"}}}
+@pytest.mark.parametrize("wrapper", ["content", "item"])
+def test_reads_old_cursor_shape(wrapper):
+    entry = {"entryId": "cursor-bottom-0", wrapper: {"itemContent": {"value": "OLD"}}}
     assert extract(None, entry) == "OLD"
 
 
-def test_reads_new_cursor_shape():
-    entry = {"entryId": "cursor-bottom-0", "content": {"value": "NEW"}}
+@pytest.mark.parametrize("wrapper", ["content", "item"])
+def test_reads_new_cursor_shape(wrapper):
+    entry = {"entryId": "cursor-bottom-0", wrapper: {"value": "NEW"}}
     assert extract(None, entry) == "NEW"
+
+
+def test_reads_show_more_replies_cursor():
+    """The nested reply cursor wraps under `item`, not `content`."""
+    reply = {"entryId": "cursor-showmorethreads-0", "item": {"itemContent": {"value": "SR"}}}
+    assert extract(None, reply) == "SR"
 
 
 def test_old_shape_wins_when_both_present():
@@ -49,11 +60,18 @@ def test_falls_through_to_new_shape_when_old_is_unusable(item_content):
 
 @pytest.mark.parametrize(
     "entry",
-    [{"entryId": "cursor-bottom-0", "content": {"foo": "bar"}}, {"entryId": "cursor-bottom-0"}],
-    ids=["unknown-shape", "no-content-key"],
+    [
+        {"entryId": "cursor-bottom-0", "content": {"foo": "bar"}},
+        {"entryId": "cursor-bottom-0"},
+        {"entryId": "cursor-bottom-0", "content": None},
+        {"entryId": "cursor-bottom-0", "content": None, "item": {"value": "NEW"}},
+    ],
+    ids=["unknown-shape", "no-content-key", "null-content", "null-content-with-item"],
 )
-def test_returns_none_when_no_cursor_found(entry):
-    assert extract(None, entry) is None
+def test_handles_missing_or_null_wrappers(entry):
+    """A null `content` must not raise — X sends an explicit null here."""
+    expected = "NEW" if entry.get("item") else None
+    assert extract(None, entry) == expected
 
 
 def test_new_shape_would_have_raised_under_the_old_code():

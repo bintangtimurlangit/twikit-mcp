@@ -129,26 +129,32 @@ class Client:
         """
         Get the pagination cursor from a TimelineCursor entry.
 
-        Supports both formats used by X:
+        X wraps cursors under ``content`` for top-level timeline entries and
+        under ``item`` for nested "show more replies" cursors, and has moved
+        the value itself out of ``itemContent``:
 
         Old:
-            content.itemContent.value
+            <content|item>.itemContent.value
 
         New:
-            content.value
+            <content|item>.value
+
+        Returns None when no cursor is present.
         """
 
-        content = entry.get("content", {})
+        for wrapper_key in ("content", "item"):
+            # `or {}` rather than a .get() default: X sends an explicit null here.
+            wrapper = entry.get(wrapper_key) or {}
 
-        item_content = content.get("itemContent")
-        if isinstance(item_content, dict):
-            value = item_content.get("value")
+            item_content = wrapper.get("itemContent")
+            if isinstance(item_content, dict):
+                value = item_content.get("value")
+                if value:
+                    return value
+
+            value = wrapper.get("value")
             if value:
                 return value
-
-        value = content.get("value")
-        if value:
-            return value
 
         return None
 
@@ -1710,7 +1716,7 @@ class Client:
                                 continue
                             replies.append(rpl)
                         if 'cursor' in reply.get('entryId'):
-                            sr_cursor = reply['item']['itemContent']['value']
+                            sr_cursor = self._extract_cursor_value(reply)
                             show_replies = partial(
                                 self._show_more_replies,
                                 tweet_id,
