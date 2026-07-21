@@ -1,5 +1,6 @@
 # twikit-x-mcp
 
+[![PyPI](https://img.shields.io/pypi/v/twikit-x-mcp?style=flat-square)](https://pypi.org/project/twikit-x-mcp/)
 [![license](https://img.shields.io/github/license/bintangtimurlangit/twikit-x-mcp?style=flat-square)](LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/bintangtimurlangit/twikit-x-mcp/ci.yml?branch=main&style=flat-square)](https://github.com/bintangtimurlangit/twikit-x-mcp/actions)
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776ab?style=flat-square&logo=python&logoColor=white)](pyproject.toml)
