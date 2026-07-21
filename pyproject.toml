@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "MCP server exposing twikit's Twitter/X capabilities to AI assistants — no official API key required."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 authors = [{ name = "bintangtimurlangit" }]
 keywords = ["mcp", "twitter", "x", "twikit", "model-context-protocol", "ai", "llm"]
 
@@ -46,9 +46,9 @@ twikit = ["py.typed"]
 dev = [
     "ruff>=0.8",
     "mypy>=1.13",
-    "pytest>=8",
-    "pre-commit>=4",
-    "commitizen>=4",
+    "pytest>=9.1.1",
+    "pre-commit>=4.6.0",
+    "commitizen>=4.16.5",
 ]
 
 # ── Tooling ──────────────────────────────────────────────────────────────────

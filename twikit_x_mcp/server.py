@@ -166,7 +166,7 @@ async def rate_limit_status() -> dict:
 # Users
 # --------------------------------------------------------------------------- #
 @mcp.tool()
-async def get_user(screen_name: str) -> dict:
+async def get_user(screen_name: str) -> dict | None:
     """Look up a user profile by @handle (screen name), e.g. "jack"."""
     client = await get_client()
     user = await client.get_user_by_screen_name(screen_name.lstrip("@"))
@@ -174,7 +174,7 @@ async def get_user(screen_name: str) -> dict:
 
 
 @mcp.tool()
-async def get_user_by_id(user_id: str) -> dict:
+async def get_user_by_id(user_id: str) -> dict | None:
     """Look up a user profile by their numeric user id."""
     client = await get_client()
     user = await client.get_user_by_id(user_id)
@@ -219,7 +219,7 @@ async def get_user_following(user_id: str, count: int = 20, cursor: str | None =
 
 
 @mcp.tool()
-async def follow_user(user_id: str) -> dict:
+async def follow_user(user_id: str) -> dict | None:
     """Follow the account with the given user id."""
     client = await get_client()
     user = await client.follow_user(user_id)
@@ -227,7 +227,7 @@ async def follow_user(user_id: str) -> dict:
 
 
 @mcp.tool()
-async def unfollow_user(user_id: str) -> dict:
+async def unfollow_user(user_id: str) -> dict | None:
     """Unfollow the account with the given user id."""
     client = await get_client()
     user = await client.unfollow_user(user_id)
@@ -254,7 +254,7 @@ async def mute_user(user_id: str) -> dict:
 # Tweets: read
 # --------------------------------------------------------------------------- #
 @mcp.tool()
-async def get_tweet(tweet_id: str) -> dict:
+async def get_tweet(tweet_id: str) -> dict | None:
     """Fetch a single tweet by its id, including engagement counts and media."""
     client = await get_client()
     tweet = await client.get_tweet_by_id(tweet_id)
@@ -316,7 +316,7 @@ async def post_tweet(
     text: str,
     reply_to: str | None = None,
     is_note_tweet: bool = False,
-) -> dict:
+) -> dict | None:
     """Post a tweet. Set ``reply_to`` to a tweet id to reply. ``is_note_tweet``
     allows long-form (>280 char) posts on eligible accounts."""
     client = await get_client()
@@ -390,7 +390,7 @@ async def get_trends(
 # Direct messages
 # --------------------------------------------------------------------------- #
 @mcp.tool()
-async def send_direct_message(user_id: str, text: str, reply_to: str | None = None) -> dict:
+async def send_direct_message(user_id: str, text: str, reply_to: str | None = None) -> dict | None:
     """Send a direct message to a user id. ``reply_to`` is an optional message id."""
     client = await get_client()
     message = await client.send_dm(user_id, text, reply_to=reply_to)

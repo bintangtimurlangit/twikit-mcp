@@ -61,27 +61,10 @@ Per the [MCP annotations spec](https://modelcontextprotocol.io/) — side effect
 
 ## Install
 
-Published on PyPI as **`twikit-x-mcp`** (the `-x` because plain `twikit-mcp` was
-already taken by another project). The easiest way to run it is with
-[`uv`](https://docs.astral.sh/uv/)'s `uvx` (the Python equivalent of `npx` —
-downloads and runs in one step, nothing to install first):
+Install and run with `uvx`:
 
 ```bash
 uvx twikit-x-mcp
-```
-
-Alternatives:
-
-```bash
-# pipx (isolated install)
-pipx install twikit-x-mcp
-
-# plain pip
-pip install twikit-x-mcp
-
-# from a clone (for development)
-git clone https://github.com/bintangtimurlangit/twikit-x-mcp
-cd twikit-x-mcp && pip install -e .
 ```
 
 > **Note:** the Python import module is `twikit_x_mcp` (underscore), per Python

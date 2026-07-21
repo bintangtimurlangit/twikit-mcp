@@ -22,7 +22,7 @@ def _get(obj: Any, name: str, default: Any = None) -> Any:
     return value
 
 
-def user_to_dict(user: Any) -> dict:
+def user_to_dict(user: Any) -> dict[str, Any] | None:
     if user is None:
         return None
     return {
@@ -58,7 +58,7 @@ def _media_to_dict(media: Any) -> dict:
     }
 
 
-def tweet_to_dict(tweet: Any, *, include_user: bool = True) -> dict:
+def tweet_to_dict(tweet: Any, *, include_user: bool = True) -> dict[str, Any] | None:
     if tweet is None:
         return None
     media = _get(tweet, "media") or []
@@ -97,7 +97,7 @@ def trend_to_dict(trend: Any) -> dict:
     }
 
 
-def message_to_dict(message: Any) -> dict:
+def message_to_dict(message: Any) -> dict[str, Any] | None:
     if message is None:
         return None
     return {

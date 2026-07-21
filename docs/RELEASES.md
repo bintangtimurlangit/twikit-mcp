@@ -14,7 +14,7 @@ Commit messages follow **[Conventional Commits](https://www.conventionalcommits.
 
 ## Publishing (maintainers)
 
-Published on PyPI as **`twikit-x-mcp`** (plain `twikit-mcp` was already taken). Because twikit is vendored in, the wheel is self-contained — no external Git dependencies to resolve.
+The PyPI distribution name is **`twikit-x-mcp`**. Because twikit is vendored in, the wheel is self-contained — no external Git dependencies to resolve.
 
 Releases are handled by the [`release` workflow](../.github/workflows/release.yml): pushing a `vX.Y.Z` tag runs `uv build` and publishes to PyPI via **Trusted Publishing (OIDC)** — tokenless — then creates a GitHub release. One-time setup: register this repo + `release.yml` as a Trusted Publisher for the `twikit-x-mcp` project on PyPI.
 
