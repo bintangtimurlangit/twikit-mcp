@@ -1,5 +1,24 @@
 # Changelog
 
+---
+
+## [0.1.0] - 2026-07-21
+
+### Fixed
+
+- Compatible con el nuevo formato de `TimelineTimelineCursor` utilizado por X.
+- Se agregó `Client._extract_cursor_value()` para soportar ambos formatos:
+  - `content.itemContent.value`
+  - `content.value`
+- Se eliminó el `KeyError: 'itemContent'` al obtener artículos largos mediante `Client.get_tweet_by_id()`.
+
+### Notes
+
+Este cambio mantiene compatibilidad con versiones anteriores de X sin romper implementaciones existentes.
+
+
+################################################################################################################
+
 All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version numbers follow [Semantic Versioning](https://semver.org/spec/v2.0.0/). For **how** we version, tag, and publish, see [docs/RELEASES.md](./docs/RELEASES.md).
